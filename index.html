@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hi Wave 🌀</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background: #000; color: #fff; font-family: Arial; padding: 20px; margin: 0; }
+    h1 { text-align: center; color: #0ff; text-shadow: 0 0 10px #0ff; }
+    .track { background: #111; margin: 15px 0; padding: 15px; border-radius: 12px; box-shadow: 0 0 15px #0ff; }
+    audio { width: 100%; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Hi Wave 🌀</h1>
+  <div id="tracks">Загружаю твои треки...</div>
+
+  <script>
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+
+    const channel = "hiwaveapp";  // ← ЗАМЕНИ НА СВОЙ (например mytracks666)
+
+    fetch(`https://t.me/s/${channel}`)
+      .then(r => r.text())
+      .then(html => {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        const audios = div.querySelectorAll('audio');
+        const container = document.getElementById('tracks');
+        container.innerHTML = '';
+
+        if (audios.length === 0) {
+          container.innerHTML = '<p>Треков нет. Загрузи MP3 как АУДИО в канал t.me/' + channel + '</p>';
+          return;
+        }
+
+        audios.forEach(a => {
+          if (a.src) {
+            const title = a.parentNode.innerText.trim() || 'Трек без названия';
+            const trackDiv = document.createElement('div');
+            trackDiv.className = 'track';
+            trackDiv.innerHTML = `<p><strong>${title}</strong></p><audio controls><source src="${a.src}" type="audio/mpeg"></audio>`;
+            container.appendChild(trackDiv);
+          }
+        });
+      })
+      .catch(() => container.innerHTML = '<p>Ошибка. Канал публичный? t.me/' + channel + '</p>');
+  </script>
+</body>
+</html>
